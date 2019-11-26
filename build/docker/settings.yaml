@@ -1,0 +1,3 @@
+default:
+  modules_path: /modulistica
+  validator_path: /validator

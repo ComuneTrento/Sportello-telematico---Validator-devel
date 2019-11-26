@@ -1,0 +1,55 @@
+stages:
+  - build
+
+.yarn_build: &yarn_build
+  image: node:lts-jessie-slim
+  stage: build
+  script:
+    - cd frontend
+    - yarn install
+    - yarn build
+  cache:
+    key: node
+    paths:
+      - node_modules/
+    policy: pull
+  dependencies: []
+  artifacts: &yarn_build_arifact
+    paths:
+      - frontend/build
+  tags:
+    - docker-executor
+
+
+yarn build develop:
+  <<: *yarn_build
+  artifacts:
+    <<: *yarn_build_arifact
+    expire_in: 1 week
+  except:
+    - tags
+    - triggers
+
+yarn build tag:
+  <<: *yarn_build
+  only:
+    - tags
+    - triggers
+
+.docker: &docker
+  stage: build
+  variables: &docker_variables
+    DOCKER_DRIVER: overlay2
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+  script:
+    - export project=$(echo $CI_JOB_NAME | sed 's|docker build ||')
+    - export project_image="$CI_REGISTRY_IMAGE/$project"
+    - docker build -t $project_image:latest -t $project_image:${CI_COMMIT_SHA:0:8} --build-arg GIT_COMMIT_SHA=${CI_COMMIT_SHA} -f Dockerfile .
+    - docker push $project_image
+  dependencies: []
+  tags:
+  - shell
+  - docker
+
+docker build validator-devel: *docker
