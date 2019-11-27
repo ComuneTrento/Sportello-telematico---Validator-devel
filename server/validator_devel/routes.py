@@ -1,9 +1,10 @@
 import pkg_resources
+import logging
 
-
+from dynaconf import settings
 from .views import (
     index, module, module_websocket_handler, module_html, module_prepare_download,
-    folder_prepare_download, home, download, edit_module, generic_rest
+    folder_prepare_download, home, download, edit_module, build_generic_rest, build_generic_proxy
 )
 from .templating import get_validator_path, get_stu3_validator_path
 
@@ -11,13 +12,27 @@ from .templating import get_validator_path, get_stu3_validator_path
 def get_static_path():
     return pkg_resources.resource_filename("validator_devel", "static")
 
+def generate_urls_from_settings(app):
+    urls = settings.get('urls')
+    for (url, data) in urls.items():
+        if isinstance(data, str) and data.startswith('http'):
+            app.router.add_route('*', url, build_generic_proxy(data))
+            continue
+
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        if 'headers' in data:
+            headers.update(data['headers'])
+
+        app.router.add_get(url, build_generic_rest(data['body'], headers))
+
 
 def setup_routes(app):
 
     # Validator handler.
     app.router.add_static('/module/validator/', path=get_validator_path(), name='validator')
     app.router.add_static('/module/stu3/validator/', path=get_stu3_validator_path(), name='stu3_validator')
-    app.router.add_static('/test/', path='/Users/mattiarossi/Develop/globo/test', name='test')
 
     app.router.add_get('/ws', module_websocket_handler)
     app.router.add_get('/module/{module_key}/download', module_prepare_download)
@@ -29,11 +44,7 @@ def setup_routes(app):
     app.router.add_get('/download/{uuid}', download)
 
     # STU3 Rest mockup.
-    app.router.add_get('/rest/session/token', generic_rest)
-    app.router.add_get('/user/stu_profile', generic_rest)
-    app.router.add_get('/stu_data_validation_cadastre/settings', generic_rest)
-    app.router.add_get('/stu_data_validation_street_map/settings', generic_rest)
-    app.router.add_get('/admin/structure/modulo/1', generic_rest)
+    generate_urls_from_settings(app)
 
     # Frontend handler.
     app.router.add_static('/', path=get_static_path(), name='static', show_index=True)

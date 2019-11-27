@@ -147,5 +147,4 @@ async def download_file(writer, code: str):
             await writer.write(chunk)
             chunk = f.read(2 ** 16)
 
-
     os.remove(path)

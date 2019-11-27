@@ -2,13 +2,17 @@
 
 this is the frontend dashboard for build module with GLOBO SRL technologies.
 
-Is built with Python and React for the frontend.
+Is built with Python and React for the frontend, python is acting as a web server, the react is the frontend that consume the API.
 
-## Requirements
+## Install
+Only Python 3 is required as a user, this software is currently hosted on [PyPi](https://pypi.org/project/validator-devel/) so you can install it with:
+`pip install validator-devel` and call in your terminal of choice `validator-devel` for the execution.
 
-* Python >= 3.7.2
-* for the frontend only: Node 10.x
+If you want to contribute you need these tools for the frontend compilation:
+* Node 10.x
 * yarn
+
+
 
 ## Build the project
 

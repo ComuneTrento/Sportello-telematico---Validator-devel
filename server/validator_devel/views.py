@@ -3,8 +3,9 @@ import jinja2
 import traceback
 import sys
 
+from urllib.parse import urlparse
 from dynaconf import settings
-from aiohttp import web, WSMsgType, http_exceptions
+from aiohttp import web, WSMsgType, http_exceptions, ClientSession
 from .filesystem import get_modules, find_module, get_all_modules_in_folder
 from .templating import (
     get_module_html, get_validator_path, get_module_dependencies,
@@ -127,7 +128,7 @@ async def module_html(request):
 
     try:
         body = get_module_html(module)
-    except (jinja2.TemplateError, jinja2.TemplateRuntimeError, jinja2.TemplateSyntaxError) as e:
+    except (jinja2.TemplateError, jinja2.TemplateRuntimeError, jinja2.TemplateSyntaxError):
         exc_type, exc_value, exc_traceback = sys.exc_info()
         body = traceback.format_exception(exc_type, exc_value, exc_traceback)
         body = '\n'.join(body)
@@ -148,7 +149,7 @@ async def module_html(request):
         stu3_template = jinja2.Template(stu3_base)
 
         return web.Response(body=stu3_template.render(module=form), headers={'content-type': 'text/html'})
-        
+
     return web.Response(body=body, headers={'content-type': 'text/html'})
 
 
@@ -163,7 +164,7 @@ async def module_websocket_handler(request):
                 await ws.close()
                 logging.debug("close a websocket")
         elif msg.type == WSMsgType.ERROR:
-            logging.error(f"closed a socket with exception {ws.exception()}")
+            logging.error(f"closed a socket async with exception {ws.exception()}")
 
     return ws
 
@@ -180,22 +181,38 @@ async def edit_module(request):
 
     return web.json_response({'status': 'ok'})
 
+
 async def home(request):
     raise web.HTTPFound(location="/index.html")
 
 
-async def generic_rest(request):
-    urls = settings.get('urls')
-    if urls is None:
-        return web.HTTPNotFound()
+def build_generic_rest(body, headers):
+    async def view(request):
+        return web.Response(
+            body= body,
+            headers= headers,
+        )
 
-    response = urls.get(request.rel_url.path)
-    if response is None:
-        return web.HTTPNotFound()
+    return view
 
-    logging.debug(f"request {request.rel_url.path} found in settings.")
 
-    return web.Response(
-        body= response.get('Body'),
-        content_type= response.get('Content-Type', 'application/json')
-    )
+def build_generic_proxy(endpoint):
+    async def proxy(request):
+        logging.debug(f"proxy on {request.path} to {endpoint}")
+        async with ClientSession(auto_decompress=False) as session:
+            body = await request.read()
+            headers = dict(request.headers)
+            o = urlparse(endpoint)
+            if o.hostname is not None:
+                headers['Host'] = o.hostname
+
+            async with session.request(request.method, endpoint, data=body, headers=headers) as response:
+                content = await response.content.read()
+
+                return web.Response(
+                    headers=response.headers,
+                    status=response.status,
+                    body=content
+                )
+
+    return proxy
