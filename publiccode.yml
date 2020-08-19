@@ -1,0 +1,70 @@
+# This repository adheres to the publiccode.yml standard by including this 
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.2'
+categories:
+  - content-management
+  - document-management
+description:
+  it:
+    features:
+      - Gestione della modulistica del comune
+    genericName: Document processor
+    longDescription: >
+      Validator Devel e uno strumento di assistenza rivolto a tutti gli
+      operatori delle pubbliche amministrazioni, permettere di generare e
+      verificare il corretto funzionamento della modulistica scritta HTML,
+      gestendo anche la sua ricerca e generazione.
+
+
+      Questo strumento e parte della Suite fornita da GLOBO SRL per la gestione
+      completa degli sportelli online verso i cittadini.
+
+
+      In particolare:
+
+
+      - Consente di gestire una copia locale della propria modulistica.
+
+      - Permette di vederla direttamente nel browser esattamente come la vedra
+      il cittadino.
+
+      - Facilita il controllo delle regole di compilazione.
+    shortDescription: Editor e generatore di modulistica pubblica interattiva
+developmentStatus: stable
+intendedAudience:
+  countries:
+    - it
+  scope:
+    - government
+    - local-authorities
+it:
+  conforme:
+    gdpr: true
+    lineeGuidaDesign: false
+    misureMinimeSicurezza: true
+    modelloInteroperabilita: false
+  countryExtensionVersion: '0.2'
+  piattaforme:
+    anpr: false
+    cie: false
+    pagopa: false
+    spid: false
+legal:
+  license: Apache-2.0
+localisation:
+  availableLanguages:
+    - it
+  localisationReady: false
+maintenance:
+  type: none
+name: Validato Devel
+platforms:
+  - web
+  - windows
+  - linux
+releaseDate: '2018-01-01'
+softwareType: standalone/backend
+softwareVersion: 2.0.7
+url: 'https://github.com/ComuneTrento/Sportello-telematico-Validator-devel'
