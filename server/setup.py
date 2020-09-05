@@ -31,6 +31,7 @@ requires = [
     'watchdog',
     'Jinja2',
     'dynaconf',
+    'Click',
 ]
 
 

@@ -48,7 +48,7 @@ This will open the file with the predefined editor for YAML files, there are som
 * `validator_path`: the path where Validator version 1 can be found.
 * `stu3_validator_path`: the path where Validator 2 (AngularJS version) can be found.
 * `stu3_base`: The basic template where STU3 module are inserted, you can change this for better error showing, or include news CSS, or test other controllers.
-* `urls`: this section allow the user for define custom URL for mock modules API, or WebService integration, proxied request are supported as well so you can integrate with your existing service.
+* `urls`: this section allow the user to define custom URL to mock modules API, or WebService integration, proxied request are supported as well so you can integrate with your existing service.
 
 #### Urls settings
 
