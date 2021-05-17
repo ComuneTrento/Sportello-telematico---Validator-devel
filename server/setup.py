@@ -32,6 +32,7 @@ requires = [
     'Jinja2',
     'dynaconf',
     'Click',
+    'beautifulsoup4',
 ]
 
 

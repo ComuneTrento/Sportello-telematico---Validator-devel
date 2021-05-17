@@ -1,0 +1,4 @@
+docker run -v $(pwd)/validator:/validator -v $(pwd)/modulistica:/modulistica -it --rm -p 8080:8080 validator-devel:debug
+
+
+docker run -v $(pwd)/validator:/validator -v $(pwd)/modulistica:/modulistica -v $(pwd)/build/docker/settings.yaml:/root/.config/validator-devel/settings.yaml -it --rm -p 8080:8080 validator-devel:debug
